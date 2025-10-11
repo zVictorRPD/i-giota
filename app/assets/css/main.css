@@ -19,5 +19,9 @@
   body {
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
+    background: var(--color-slate-950);
+  }
+  button {
+    cursor: pointer;
   }
 }
