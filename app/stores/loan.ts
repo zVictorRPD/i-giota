@@ -5,6 +5,7 @@ export const useLoanStore = defineStore("loan", {
   state: (): ILoanStorage => ({
     isAddLoanModalOpen: false,
     isAddParcelModalOpen: false,
+    refreshLoans: false,
   }),
   actions: {
     openAddLoanModal() {
@@ -13,12 +14,17 @@ export const useLoanStore = defineStore("loan", {
     closeAddLoanModal() {
       this.isAddLoanModalOpen = false;
     },
+    disableRefreshLoans() {
+      this.refreshLoans = false;
+    },
     async registerLoan(data: TAddLoanData) {
       try {
         await $fetch("/api/loan", {
           method: "POST",
           body: data,
         });
+        this.refreshLoans = true;
+        this.isAddLoanModalOpen = false;
       } catch (error: any) {
         console.error("Error registering loan:", error);
         return error;
