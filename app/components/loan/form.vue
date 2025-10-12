@@ -1,105 +1,12 @@
-<script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui";
-import * as z from "zod";
-
-const totalValueMasked = computed({
-  get() {
-    return state.total_value || "";
-  },
-  set(newValue: string) {
-    // Aplica a máscara ao digitar
-    state.total_value = moneyMask(newValue);
-  },
-});
-
-const schema = z
-  .object({
-    name: z
-      .string("Campo obrigatório")
-      .min(2, "O nome deve ter no mínimo 2 caracteres"),
-    total_value: z.string("Campo obrigatório").refine(
-      (value) => {
-        const numberValue = Number(removeMask(value));
-        return !isNaN(numberValue) && numberValue > 0;
-      },
-      {
-        message: "O valor total deve ser maior que 0",
-      }
-    ),
-    is_fixed: z.boolean().default(false),
-    installments: z
-      .number()
-      .gte(1, "O número de parcelas deve ser maior ou igual a 1")
-      .optional(),
-
-    interest_rate: z
-      .number()
-      .gte(0, "A taxa de juros deve ser maior ou igual a 0")
-      .optional(),
-
-    start_date: z
-      .string()
-      .optional()
-      .refine((date) => {
-        if (!date) return true;
-        const selectedDate = new Date(date);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        return selectedDate >= today;
-      }, "A data de início não pode ser no passado"),
-  })
-  .superRefine((data, ctx) => {
-    if (data.is_fixed) {
-      if (data.installments === undefined || data.installments < 1) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Campo obrigatório",
-          path: ["installments"], // Associa o erro ao campo 'installments'
-        });
-      }
-      if (data.interest_rate === undefined || data.interest_rate < 0) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Campo obrigatório",
-          path: ["interest_rate"], // Associa o erro ao campo 'interest_rate'
-        });
-      }
-      if (!data.start_date) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Campo obrigatório",
-          path: ["start_date"], // Associa o erro ao campo 'start_date'
-        });
-      }
-    }
-  });
-
-type Schema = z.output<typeof schema>;
-
-const state = reactive<Partial<Schema>>({
-  name: undefined,
-  total_value: undefined,
-  is_fixed: false,
-  installments: undefined,
-  interest_rate: undefined,
-  start_date: undefined,
-});
-
-const toast = useToast();
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  console.log("event", event);
-
-  toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
-  });
-}
-</script>
 <template>
   <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
     <UFormField label="Nome" name="name">
-      <UInput v-model="state.name" class="w-full" size="xl" />
+      <UInput
+        v-model="state.name"
+        class="w-full"
+        size="xl"
+        placeholder="Nome"
+      />
     </UFormField>
     <UFormField label="Valor total" name="total_value">
       <UInput
@@ -152,8 +59,101 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       </UFormField>
     </template>
 
-    <div class="pt-4">
-      <UButton type="submit" color="primary">Submit</UButton>
+    <div class="pt-4 text-end space-x-4">
+      <UButton
+        color="info"
+        variant="ghost"
+        size="xl"
+        @click="closeAddLoanModal"
+      >
+        Voltar
+      </UButton>
+      <UButton type="submit" color="info" size="xl">Cadastrar</UButton>
     </div>
   </UForm>
 </template>
+
+<script setup lang="ts">
+import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+const { closeAddLoanModal } = useLoanStore();
+
+const totalValueMasked = computed({
+  get() {
+    return state.total_value || "";
+  },
+  set(newValue: string) {
+    state.total_value = moneyMask(newValue);
+  },
+});
+
+const schema = z.discriminatedUnion("is_fixed", [
+  // Schema para quando is_fixed = false
+  z.object({
+    is_fixed: z.literal(false).default(false),
+    name: z
+      .string("Campo obrigatório")
+      .min(2, "O nome deve ter no mínimo 2 caracteres"),
+    total_value: z.string("Campo obrigatório").refine(
+      (value) => {
+        const numberValue = Number(removeMask(value));
+        return !isNaN(numberValue) && numberValue > 0;
+      },
+      {
+        message: "O valor total deve ser maior que 0",
+      }
+    ),
+    // Campos opcionais quando não é fixo
+    installments: z.number().optional(),
+    interest_rate: z.number().optional(),
+    start_date: z.string().optional(),
+  }),
+
+  // Schema para quando is_fixed = true
+  z.object({
+    is_fixed: z.literal(true),
+    name: z
+      .string("Campo obrigatório")
+      .min(2, "O nome deve ter no mínimo 2 caracteres"),
+    total_value: z.string("Campo obrigatório").refine(
+      (value) => {
+        const numberValue = Number(removeMask(value));
+        return !isNaN(numberValue) && numberValue > 0;
+      },
+      {
+        message: "O valor total deve ser maior que 0",
+      }
+    ),
+    // Campos que agora são OBRIGATÓRIOS
+    installments: z
+      .number("Campo obrigatório")
+      .gte(1, "O número de parcelas deve ser maior ou igual a 1"),
+    interest_rate: z
+      .number("Campo obrigatório")
+      .gte(0, "A taxa de juros deve ser maior ou igual a 0"),
+    start_date: z.string("Campo obrigatório").min(1, "Campo obrigatório"),
+  }),
+]);
+
+type Schema = z.output<typeof schema>;
+
+const state = reactive<Partial<Schema>>({
+  name: undefined,
+  total_value: undefined,
+  is_fixed: false,
+  installments: undefined,
+  interest_rate: undefined,
+  start_date: undefined,
+});
+
+const toast = useToast();
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+  console.log("event", event);
+
+  toast.add({
+    title: "Success",
+    description: "The form has been submitted.",
+    color: "success",
+  });
+}
+</script>

@@ -21,5 +21,36 @@
     </div>
   </div>
   <LoanCoinsBorder />
-  <LoanParcelCard />
+  <div class="grid gap-2.5 max-h-[calc(100vh-22.5rem)] overflow-y-auto">
+    <LoanParcelCard
+      v-for="value in 4"
+      :key="value"
+      @pay-parcel="payParcel"
+      @cancel-parcel="cancelParcel"
+    />
+  </div>
+  <UButton
+    icon="i-lucide-plus"
+    color="neutral"
+    class="absolute p-4 bottom-0 right-0"
+    size="xl"
+    @click="openAddParcelModal"
+  >
+    <span class="sr-only"> Adicionar Parcela </span>
+  </UButton>
+  <LoanParcelAddModal />
 </template>
+
+<script setup lang="ts">
+const route = useRoute();
+const slot = route.params.slot as string;
+const { openAddParcelModal } = useLoanStore();
+
+const payParcel = () => {
+  console.log("pay parcel", slot);
+};
+
+const cancelParcel = () => {
+  console.log("cancel parcel", slot);
+};
+</script>

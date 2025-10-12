@@ -6,7 +6,7 @@
   <LoanCoinsBorder />
   <div class="grid gap-2.5">
     <NuxtLink to="/1">
-      <LoanHomeCard />
+      <LoanCard />
     </NuxtLink>
   </div>
   <UButton

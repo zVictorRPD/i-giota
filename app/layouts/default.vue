@@ -1,7 +1,16 @@
 <template>
   <header class="max-w-xl mx-auto p-4">
     <nav>
-      <ul class="flex justify-end gap-4">
+      <ul
+        class="flex items-center gap-4"
+        :class="returnToHome ? 'justify-between' : 'justify-end'"
+      >
+        <li v-if="returnToHome">
+          <NuxtLink to="/" class="flex items-center gap-2 text-lg">
+            <UIcon name="i-lucide-arrow-left" size="24" />
+            Voltar
+          </NuxtLink>
+        </li>
         <li>
           <UButton icon="i-lucide-log-out" color="neutral" size="md" />
         </li>
@@ -14,3 +23,8 @@
     </div>
   </main>
 </template>
+
+<script setup lang="ts">
+const route = useRoute();
+const returnToHome = computed(() => route.name !== "index");
+</script>

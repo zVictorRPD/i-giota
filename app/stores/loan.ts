@@ -3,6 +3,7 @@ import type { ILoanStorage } from "~/interfaces/loan";
 export const useLoanStore = defineStore("loan", {
   state: (): ILoanStorage => ({
     isAddLoanModalOpen: false,
+    isAddParcelModalOpen: false,
   }),
   actions: {
     openAddLoanModal() {
@@ -10,6 +11,12 @@ export const useLoanStore = defineStore("loan", {
     },
     closeAddLoanModal() {
       this.isAddLoanModalOpen = false;
+    },
+    openAddParcelModal() {
+      this.isAddParcelModalOpen = true;
+    },
+    closeAddParcelModal() {
+      this.isAddParcelModalOpen = false;
     },
   },
 });
