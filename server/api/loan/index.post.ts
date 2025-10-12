@@ -1,5 +1,5 @@
 import { db } from "~/db";
-import { loans } from "~/db/schema";
+import { loans, parcels } from "~/db/schema";
 import { removeMask } from "~/utils/masks";
 
 export default defineEventHandler(async (event) => {
@@ -35,11 +35,41 @@ export default defineEventHandler(async (event) => {
       startDate: input.start_date,
       userId: Number(userId),
     }).returning();
-    return { success: true, loan: res[0] };
+    
+    const resultado = [];
+  const amortizacao = Math.round(parsedTotalValue / Number(input.installments));
+  let saldoDevedor = parsedTotalValue;
+  const now = new Date().toISOString();
+  let paidValue = 0; 
+
+  for (let i = 1; i <= Number(input.installments); i++) {
+    const juros = Math.round(saldoDevedor * input.interest_rate / 100);
+    const value = amortizacao + juros;
+    
+  
+    const due = new Date(input.start_date);
+    due.setMonth(due.getMonth() + (i - 1));
+    const dueDate = due.toISOString().split('T')[0];
+    
+    resultado.push({
+      value: value,
+      paidValue: paidValue,   
+      dueDate: dueDate,
+      paidAt: null,          
+      loanId: res[0].id,
+      createdAt: now,
+      updatedAt: now
+    });
+    saldoDevedor -= amortizacao;
+  }
+
+      await db.insert(parcels).values(resultado);
+
+
+    return { success: true, loan: res[0], parcels: resultado };
   } catch (error) {
     console.error("Error inserting loan:", error);
     return { success: false, error };
   }
 
-  return { success: true };
 });
