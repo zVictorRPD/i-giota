@@ -1,6 +1,7 @@
 export interface ILoanStorage {
   isAddLoanModalOpen: boolean;
   isAddParcelModalOpen: boolean;
+  refreshLoans: boolean;
 }
 
 export interface IListResponse {

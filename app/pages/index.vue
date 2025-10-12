@@ -1,10 +1,15 @@
 <template>
-  <template v-if="data !== undefined">
-    <div class="px-4">
-      <h6>Total a receber</h6>
-      <h2 class="text-4xl font-bold">{{ totalToReceive }}</h2>
+  <div class="px-4">
+    <h6>Total a receber</h6>
+    <h2 class="text-4xl font-bold">{{ totalToReceive }}</h2>
+  </div>
+  <LoanCoinsBorder />
+  <template v-if="pending">
+    <div class="flex justify-center items-center h-96">
+      <UIcon name="i-lucide-loader-circle" class="animate-spin" :size="40" />
     </div>
-    <LoanCoinsBorder />
+  </template>
+  <template v-else-if="data !== undefined">
     <div class="grid gap-2.5">
       <NuxtLink v-for="loan in data.loans" :to="`/${loan.id}`">
         <LoanCard :loan="loan" />
@@ -19,19 +24,27 @@
     >
       <span class="sr-only"> Adicionar Empréstimo </span>
     </UButton>
-    <LoanAddModal />
   </template>
+  <LoanAddModal />
 </template>
 <script setup lang="ts">
-const { data } = await useFetch("/api/loan/list");
-const { openAddLoanModal } = useLoanStore();
+const { data, refresh, pending } = await useFetch("/api/loan/list");
+const { openAddLoanModal, disableRefreshLoans } = useLoanStore();
+const { refreshLoans } = storeToRefs(useLoanStore());
+
+watch(refreshLoans, (newVal) => {
+  if (newVal) {
+    refresh();
+    disableRefreshLoans();
+  }
+});
+
 const totalToReceive = computed(() => {
   const totalLoans =
     data.value?.loans.reduce((acc, loan) => acc + loan.totalValue, 0) || 0;
   const totalParcels =
     data.value?.loans.reduce((acc, loan) => acc + loan.parcelsTotalPaid, 0) ||
     0;
-
   return moneyMask(String(totalLoans - totalParcels));
 });
 </script>
