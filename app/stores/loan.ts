@@ -1,3 +1,4 @@
+import type { Schema as TAddLoanData } from "~/components/loan/form.vue";
 import type { ILoanStorage } from "~/interfaces/loan";
 
 export const useLoanStore = defineStore("loan", {
@@ -11,6 +12,17 @@ export const useLoanStore = defineStore("loan", {
     },
     closeAddLoanModal() {
       this.isAddLoanModalOpen = false;
+    },
+    async registerLoan(data: TAddLoanData) {
+      try {
+        await $fetch("/api/loan", {
+          method: "POST",
+          body: data,
+        });
+      } catch (error: any) {
+        console.error("Error registering loan:", error);
+        return error;
+      }
     },
     openAddParcelModal() {
       this.isAddParcelModalOpen = true;

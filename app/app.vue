@@ -1,3 +1,10 @@
+<template>
+  <UApp>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
+</template>
 <script setup>
 useHead({
   meta: [{ name: "viewport", content: "width=device-width, initial-scale=1" }],
@@ -17,10 +24,14 @@ useSeoMeta({
   ogTitle: title,
   ogDescription: description,
 });
-</script>
 
-<template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
-</template>
+const cookie = useCookie("user");
+
+if (!cookie.value) {
+  cookie.value = {
+    id: 1,
+    name: "Victor Martins",
+    email: "victor2007azevedo@hotmail.com",
+  };
+}
+</script>

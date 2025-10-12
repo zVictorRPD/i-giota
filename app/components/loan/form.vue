@@ -76,7 +76,8 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
-const { closeAddLoanModal } = useLoanStore();
+const toast = useToast();
+const { closeAddLoanModal, registerLoan } = useLoanStore();
 
 const totalValueMasked = computed({
   get() {
@@ -135,7 +136,7 @@ const schema = z.discriminatedUnion("is_fixed", [
   }),
 ]);
 
-type Schema = z.output<typeof schema>;
+export type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
   name: undefined,
@@ -146,14 +147,20 @@ const state = reactive<Partial<Schema>>({
   start_date: undefined,
 });
 
-const toast = useToast();
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  console.log("event", event);
-
+  const error = await registerLoan(event.data);
+  if (!error) {
+    toast.add({
+      title: "Sucesso",
+      description: "Empréstimo cadastrado com sucesso!",
+      color: "success",
+    });
+    return;
+  }
   toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
+    title: "Erro",
+    description: error?.message || "Ocorreu um erro ao cadastrar o empréstimo.",
+    color: "error",
   });
 }
 </script>
