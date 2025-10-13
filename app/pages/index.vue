@@ -10,7 +10,7 @@
     </div>
   </template>
   <template v-else-if="data !== undefined">
-    <div class="grid gap-2.5">
+    <div class="grid gap-2.5 max-h-[calc(100vh-20rem)] overflow-y-auto">
       <NuxtLink v-for="loan in data.loans" :to="`/${loan.id}`">
         <LoanCard :loan="loan" />
       </NuxtLink>

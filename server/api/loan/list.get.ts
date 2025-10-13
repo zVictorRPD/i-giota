@@ -35,12 +35,14 @@ export default defineEventHandler(async (event) => {
         0
       );
 
+      const nextPayment = loan.parcels.find((parcel: any) => !parcel.paidDate);
+
       return {
         id: loan.id,
         name: loan.name,
         totalValue: loan.totalValue,
         parcelsTotalPaid,
-        nextPayment: new Date().toISOString(),
+        nextPayment: nextPayment?.dueDate || null,
       };
     }) as IListResponse[];
 
