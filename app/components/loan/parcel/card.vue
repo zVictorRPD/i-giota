@@ -6,14 +6,14 @@
       </h6>
       <p>Parcela {{ number }} - {{ formattedDate }}</p>
     </div>
-    <div class="flex justify-end items-center">
+    <div class="flex justify-end items-center gap-1.5">
       <UButton
         v-if="!isPaid"
         size="sm"
         color="success"
         icon="i-lucide-dollar-sign"
         label="Pagar"
-        @click="handlePay"
+        @click="emit('payParcel')"
       />
       <UButton
         v-else
@@ -21,7 +21,13 @@
         color="error"
         icon="i-lucide-undo-2"
         label="Cancelar"
-        @click="handleCancel"
+        @click="emit('cancelParcel')"
+      />
+      <UButton
+        size="sm"
+        color="error"
+        icon="i-lucide-trash-2"
+        @click="emit('deleteParcel')"
       />
     </div>
   </MainCard>
@@ -31,6 +37,7 @@
 const emit = defineEmits<{
   (e: "payParcel"): void;
   (e: "cancelParcel"): void;
+  (e: "deleteParcel"): void;
 }>();
 const props = defineProps<{
   number: number;
@@ -49,6 +56,7 @@ const props = defineProps<{
 const formattedDate = computed(() => {
   if (!props.parcel.dueDate) return "Sem data";
   const date = new Date(props.parcel.dueDate);
+  date.setHours(date.getHours() + 3);
   return date.toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
@@ -63,12 +71,4 @@ const isPaid = computed(() => {
 const value = computed(() => {
   return moneyMask(String(props.parcel.value));
 });
-
-const handlePay = () => {
-  emit("payParcel");
-};
-
-const handleCancel = () => {
-  emit("cancelParcel");
-};
 </script>

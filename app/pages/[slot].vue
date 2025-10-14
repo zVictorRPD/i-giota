@@ -38,8 +38,9 @@
         :key="parcel.id"
         :parcel="parcel"
         :number="index + 1"
-        @pay-parcel="payParcel"
-        @cancel-parcel="cancelParcel"
+        @pay-parcel="handlePayParcel(parcel)"
+        @cancel-parcel="handleCancelParcel(parcel.id)"
+        @delete-parcel="openDeleteParcelModal(parcel)"
       />
     </template>
     <template v-else>
@@ -54,30 +55,66 @@
   </div>
   <UButton
     icon="i-lucide-plus"
-    color="neutral"
+    color="success"
     class="absolute p-4 bottom-0 right-0"
     size="xl"
-    @click="openAddParcelModal"
+    @click="handleAddParcel"
   >
     <span class="sr-only"> Adicionar Parcela </span>
   </UButton>
   <LoanParcelAddModal />
+  <LoanParcelDeleteModal />
 </template>
 
 <script setup lang="ts">
+import type { IParcel } from "~/interfaces/loan";
+const toast = useToast();
 const route = useRoute();
 const slot = route.params.slot as string;
-const { openAddParcelModal } = useLoanStore();
+const {
+  openAddParcelModal,
+  setParcelData,
+  disableRefreshParcels,
+  cancelParcel,
+  openDeleteParcelModal,
+} = useLoanStore();
+const { refreshParcels } = storeToRefs(useLoanStore());
 const { data, pending, refresh } = await useFetch("/api/loan", {
   params: { id: slot },
 });
 
-const payParcel = () => {
-  console.log("pay parcel", slot);
+watch(refreshParcels, (newVal) => {
+  if (newVal) {
+    refresh();
+    disableRefreshParcels();
+  }
+});
+
+const handleAddParcel = () => {
+  setParcelData(null);
+  openAddParcelModal();
 };
 
-const cancelParcel = () => {
-  console.log("cancel parcel", slot);
+const handlePayParcel = (parcel: IParcel) => {
+  setParcelData(parcel);
+  openAddParcelModal();
+};
+
+const handleCancelParcel = async (parcelId: number) => {
+  const error = await cancelParcel(parcelId);
+  if (!error) {
+    toast.add({
+      title: "Sucesso",
+      description: "Parcela deletada com sucesso.",
+      color: "success",
+    });
+    return;
+  }
+  toast.add({
+    title: "Erro",
+    description: error?.message || "Ocorreu um erro ao deletar a parcela.",
+    color: "error",
+  });
 };
 
 const totalValue = computed(() => {

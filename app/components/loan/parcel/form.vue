@@ -9,13 +9,7 @@
       />
     </UFormField>
     <UFormField label="Data" name="date" class="col-span-2">
-      <UInput
-        type="date"
-        v-model="state.date"
-        :min="new Date().toISOString().split('T')[0]"
-        class="w-full"
-        size="xl"
-      />
+      <UInput type="date" v-model="state.date" class="w-full" size="xl" />
     </UFormField>
     <div class="pt-4 text-end space-x-4">
       <UButton
@@ -26,7 +20,7 @@
       >
         Voltar
       </UButton>
-      <UButton type="submit" color="info" size="xl">Cadastrar</UButton>
+      <UButton type="submit" color="success" size="xl">Registrar</UButton>
     </div>
   </UForm>
 </template>
@@ -34,7 +28,17 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
-const { closeAddParcelModal } = useLoanStore();
+const { closeAddParcelModal, registerParcel } = useLoanStore();
+const { parcelData } = storeToRefs(useLoanStore());
+
+onMounted(() => {
+  if (parcelData.value) {
+    state.paid_value = moneyMask(String(parcelData.value.value ?? ""));
+    state.date = parcelData.value.dueDate
+      ? new Date(parcelData.value.dueDate).toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0];
+  }
+});
 
 const payedValueMasked = computed({
   get() {
@@ -62,17 +66,29 @@ type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
   paid_value: undefined,
-  date: undefined,
+  date: new Date().toISOString().split("T")[0],
 });
 
 const toast = useToast();
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-  console.log("event", event);
-
+  const error = await registerParcel({
+    parcelId: parcelData.value?.id,
+    loanId: parcelData.value?.loanId!,
+    paidValue: event.data.paid_value,
+    dueDate: event.data.date,
+  });
+  if (!error) {
+    toast.add({
+      title: "Sucesso",
+      description: "Empréstimo cadastrado com sucesso!",
+      color: "success",
+    });
+    return;
+  }
   toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
+    title: "Erro",
+    description: error?.message || "Ocorreu um erro ao cadastrar o empréstimo.",
+    color: "error",
   });
 }
 </script>
