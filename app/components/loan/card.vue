@@ -29,6 +29,7 @@ const totalValue = computed(() => {
 const nextPayment = computed(() => {
   if (!props.loan.nextPayment) return false;
   const date = new Date(props.loan.nextPayment);
+  date.setHours(date.getHours() + 3);
   return date.toLocaleDateString("pt-BR", {
     day: "2-digit",
     month: "2-digit",

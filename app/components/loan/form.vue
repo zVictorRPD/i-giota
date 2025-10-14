@@ -144,7 +144,7 @@ const state = reactive<Partial<Schema>>({
   is_fixed: false,
   installments: undefined,
   interest_rate: undefined,
-  start_date: undefined,
+  start_date: new Date().toISOString().split("T")[0],
 });
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
