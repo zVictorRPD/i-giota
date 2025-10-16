@@ -22,6 +22,7 @@
         icon="i-lucide-undo-2"
         label="Cancelar"
         @click="emit('cancelParcel')"
+        :loading="submitting"
       />
       <UButton
         size="sm"
@@ -52,6 +53,8 @@ const props = defineProps<{
     updatedAt: string;
   };
 }>();
+
+const { submitting } = storeToRefs(useLoanStore());
 
 const formattedDate = computed(() => {
   if (!props.parcel.dueDate) return "Sem data";

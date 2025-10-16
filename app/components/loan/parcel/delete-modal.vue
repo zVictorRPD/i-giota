@@ -16,7 +16,7 @@
           <UButton color="info" variant="ghost" size="xl" @click="isDeleteParcelModalOpen = false">
             Voltar
           </UButton>
-          <UButton color="error" size="xl" @click="handleDeleteParcel">
+          <UButton color="error" size="xl" @click="handleDeleteParcel" :loading="submitting">
             Deletar
           </UButton>
         </div>
@@ -26,7 +26,7 @@
 </template>
 <script setup lang="ts">
 const { deleteParcel } = useLoanStore();
-const { parcelData, isDeleteParcelModalOpen } = storeToRefs(useLoanStore());
+const { parcelData, isDeleteParcelModalOpen, submitting } = storeToRefs(useLoanStore());
 const toast = useToast();
 const handleDeleteParcel = async () => {
   const error = await deleteParcel(parcelData.value?.id!);

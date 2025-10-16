@@ -5,6 +5,7 @@ export interface ILoanStorage {
   parcelData: IParcel | null;
   refreshLoans: boolean;
   refreshParcels: boolean;
+  submitting: boolean;
 }
 
 export interface IListResponse {

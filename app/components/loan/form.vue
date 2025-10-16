@@ -68,7 +68,9 @@
       >
         Voltar
       </UButton>
-      <UButton type="submit" color="info" size="xl">Cadastrar</UButton>
+      <UButton :loading="submitting" type="submit" color="info" size="xl">
+        Cadastrar
+      </UButton>
     </div>
   </UForm>
 </template>
@@ -78,6 +80,7 @@ import type { FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
 const toast = useToast();
 const { closeAddLoanModal, registerLoan } = useLoanStore();
+const { submitting } = storeToRefs(useLoanStore());
 
 const totalValueMasked = computed({
   get() {

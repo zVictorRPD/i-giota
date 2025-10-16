@@ -9,6 +9,7 @@ export const useLoanStore = defineStore("loan", {
     parcelData: null,
     refreshLoans: false,
     refreshParcels: false,
+    submitting: false,
   }),
   actions: {
     openAddLoanModal() {
@@ -22,6 +23,7 @@ export const useLoanStore = defineStore("loan", {
     },
     async registerLoan(data: TAddLoanData) {
       try {
+        this.submitting = true;
         await $fetch("/api/loan", {
           method: "POST",
           body: data,
@@ -31,6 +33,8 @@ export const useLoanStore = defineStore("loan", {
       } catch (error: any) {
         console.error("Error registering loan:", error);
         return error;
+      } finally {
+        this.submitting = false;
       }
     },
     openAddParcelModal() {
@@ -56,8 +60,9 @@ export const useLoanStore = defineStore("loan", {
       parcelId,
     }: IRegisterParcel) {
       try {
+        this.submitting = true;
         await $fetch("/api/loan/parcel", {
-          method: "POST",
+          method: "DELETE",
           body: {
             loanId,
             paidValue,
@@ -70,10 +75,13 @@ export const useLoanStore = defineStore("loan", {
       } catch (error: any) {
         console.error("Error registering parcel:", error);
         return error;
+      } finally {
+        this.submitting = false;
       }
     },
     async cancelParcel(parcelId: number) {
       try {
+        this.submitting = true;
         await $fetch(`/api/loan/parcel/cancel/${parcelId}`, {
           method: "PUT",
         });
@@ -83,19 +91,24 @@ export const useLoanStore = defineStore("loan", {
       } catch (error: any) {
         console.error("Error canceling parcel:", error);
         return error;
+      } finally {
+        this.submitting = false;
       }
     },
     async deleteParcel(parcelId: number) {
       try {
-        await $fetch(`/api/loan/parcel/${parcelId}`, {
+        this.submitting = true;
+        await $fetch(`/api/loan/parcel?id=${parcelId}`, {
           method: "DELETE",
         });
         this.refreshParcels = true;
         this.parcelData = null;
-        this.isAddParcelModalOpen = false;
+        this.isDeleteParcelModalOpen = false;
       } catch (error: any) {
         console.error("Error deleting parcel:", error);
         return error;
+      } finally {
+        this.submitting = false;
       }
     },
   },

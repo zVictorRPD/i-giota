@@ -20,7 +20,9 @@
       >
         Voltar
       </UButton>
-      <UButton type="submit" color="success" size="xl">Registrar</UButton>
+      <UButton type="submit" color="success" size="xl" :loading="submitting">
+        Registrar
+      </UButton>
     </div>
   </UForm>
 </template>
@@ -29,7 +31,7 @@
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
 const { closeAddParcelModal, registerParcel } = useLoanStore();
-const { parcelData } = storeToRefs(useLoanStore());
+const { parcelData, submitting } = storeToRefs(useLoanStore());
 
 onMounted(() => {
   if (parcelData.value) {
