@@ -62,7 +62,7 @@ export const useLoanStore = defineStore("loan", {
       try {
         this.submitting = true;
         await $fetch("/api/loan/parcel", {
-          method: "DELETE",
+          method: "POST",
           body: {
             loanId,
             paidValue,

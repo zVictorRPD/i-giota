@@ -34,7 +34,7 @@ const { closeAddParcelModal, registerParcel } = useLoanStore();
 const { parcelData, submitting } = storeToRefs(useLoanStore());
 
 onMounted(() => {
-  if (parcelData.value) {
+  if (parcelData.value && parcelData.value.id) {
     state.paid_value = moneyMask(String(parcelData.value.value ?? ""));
     state.date = parcelData.value.dueDate
       ? new Date(parcelData.value.dueDate).toISOString().split("T")[0]

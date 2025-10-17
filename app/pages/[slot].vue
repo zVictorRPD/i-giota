@@ -93,7 +93,9 @@ watch(refreshParcels, (newVal) => {
 });
 
 const handleAddParcel = () => {
-  setParcelData(null);
+  setParcelData({
+    loanId: Number(slot),
+  } as IParcel);
   openAddParcelModal();
 };
 
