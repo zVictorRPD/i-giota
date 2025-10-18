@@ -4,8 +4,6 @@ import { parcels } from "~/db/schema";
 
 export default defineEventHandler(async (event) => {
   const parcelId = Number(getQuery(event).id as string);
-  
-  // const parcelId = input.id;
   if (!parcelId) {
     return { success: false, error: "O Id da parcela é obrigatório" };
   }

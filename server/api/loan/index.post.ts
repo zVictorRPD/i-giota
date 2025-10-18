@@ -4,7 +4,8 @@ import { removeMask } from "~/utils/masks";
 
 export default defineEventHandler(async (event) => {
   const input = await readBody(event);
-  const userId = JSON.parse(parseCookies(event).user || "{}").id;
+  const userPayload = requireAuth(event);
+  const userId = Number(userPayload.id);
   const parsedTotalValue = Number(removeMask(input.total_value));
 
   if (!input.is_fixed) {

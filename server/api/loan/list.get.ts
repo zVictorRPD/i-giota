@@ -2,9 +2,11 @@ import { eq } from "drizzle-orm";
 import { db } from "~/db";
 import { loans, parcels } from "~/db/schema";
 import type { IListResponse } from "~/interfaces/loan";
+import { requireAuth } from "~~/server/utils/session";
 
 export default defineEventHandler(async (event) => {
-  const userId = JSON.parse(parseCookies(event).user || "{}").id;
+  const userPayload = requireAuth(event);
+  const userId = Number(userPayload.id);
   try {
     const rawResults = await db
       .select()

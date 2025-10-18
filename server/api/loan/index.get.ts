@@ -3,19 +3,22 @@ import { db } from "~/db";
 import { loans, parcels } from "~/db/schema";
 
 export default defineEventHandler(async (event) => {
-  const userId = JSON.parse(parseCookies(event).user || "{}").id;
+  const userPayload = requireAuth(event);
+  const userId = Number(userPayload.id);
   try {
     const query = getQuery(event);
     const loanId = query.id as string;
+    const loandIdNumber = Number(loanId);
+    if(isNaN(loandIdNumber)) throw createError({ statusCode: 400, statusMessage: "Loan ID is required" });
     const loan = await db
       .select()
       .from(loans)
-      .where(and(eq(loans.id, Number(loanId)), eq(loans.userId, userId)))
+      .where(and(eq(loans.id, loandIdNumber), eq(loans.userId, userId)))
       .get();
     const parcelsFromLoan = await db
       .select()
       .from(parcels)
-      .where(eq(parcels.loanId, Number(loanId)));
+      .where(eq(parcels.loanId, loandIdNumber));
     const receivedValue = parcelsFromLoan.reduce(
       (acc, parcel) => acc + parcel.paidValue,
       0

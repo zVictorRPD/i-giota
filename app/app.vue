@@ -24,14 +24,4 @@ useSeoMeta({
   ogTitle: title,
   ogDescription: description,
 });
-
-const cookie = useCookie("user");
-
-if (!cookie.value) {
-  cookie.value = {
-    id: 1,
-    name: "Victor Martins",
-    email: "victor2007azevedo@hotmail.com",
-  };
-}
 </script>

@@ -5,7 +5,7 @@
       <p>{{ totalPaid }} / {{ totalValue }}</p>
     </div>
     <div class="grid gap-1 text-right items-center">
-      <h6 class="font-bold">{{ percentPaid }}%</h6>
+      <h6 class="font-bold">{{ percentPaid.toFixed(2) }}%</h6>
       <p class="text-sm" v-if="nextPayment">{{ nextPayment }}</p>
     </div>
   </MainCard>

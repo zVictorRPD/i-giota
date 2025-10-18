@@ -82,8 +82,11 @@ export const useLoanStore = defineStore("loan", {
     async cancelParcel(parcelId: number) {
       try {
         this.submitting = true;
-        await $fetch(`/api/loan/parcel/cancel/${parcelId}`, {
+        await $fetch(`/api/loan/parcel/cancel`, {
           method: "PUT",
+          body: {
+            parcelId,
+          },
         });
         this.refreshParcels = true;
         this.parcelData = null;

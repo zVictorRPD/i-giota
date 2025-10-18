@@ -12,7 +12,12 @@
           </NuxtLink>
         </li>
         <li>
-          <UButton icon="i-lucide-log-out" color="neutral" size="md" />
+          <UButton
+            icon="i-lucide-log-out"
+            color="neutral"
+            size="md"
+            @click="handleLogout"
+          />
         </li>
       </ul>
     </nav>
@@ -27,4 +32,15 @@
 <script setup lang="ts">
 const route = useRoute();
 const returnToHome = computed(() => route.name !== "index");
+const { loggedIn, user, setUser } = useAuth();
+
+async function handleLogout() {
+  try {
+    await $fetch("/api/auth/logout", { method: "POST" });
+    setUser(null);
+    await navigateTo("/auth/login");
+  } catch (error) {
+    console.error("Erro ao fazer logout:", error);
+  }
+}
 </script>

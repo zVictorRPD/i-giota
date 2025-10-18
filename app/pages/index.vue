@@ -10,11 +10,23 @@
     </div>
   </template>
   <template v-else-if="data !== undefined">
-    <div class="grid gap-2.5 max-h-[calc(100vh-20rem)] overflow-y-auto">
-      <NuxtLink v-for="loan in data.loans" :to="`/${loan.id}`">
-        <LoanCard :loan="loan" />
-      </NuxtLink>
-    </div>
+    <template v-if="data.loans.length > 0">
+      <div class="grid gap-2.5 max-h-[calc(100vh-20rem)] overflow-y-auto">
+        <NuxtLink v-for="loan in data.loans" :to="`/${loan.id}`">
+          <LoanCard :loan="loan" />
+        </NuxtLink>
+      </div>
+    </template>
+    <template v-else>
+      <div class="flex flex-col justify-center items-center h-96 text-center">
+        <UIcon name="i-lucide-inbox" :size="48" class="opacity-60 mb-4" />
+        <h6 class="font-bold">Nenhum empréstimo encontrado</h6>
+        <p class="text-sm opacity-60">
+          Adicione um novo para começar a gerenciar sua vida financeira
+        </p>
+      </div>
+    </template>
+
     <UButton
       icon="i-lucide-plus"
       color="neutral"

@@ -52,7 +52,6 @@
         <UInput
           type="date"
           v-model="state.start_date"
-          :min="new Date().toISOString().split('T')[0]"
           class="w-full"
           size="xl"
         />

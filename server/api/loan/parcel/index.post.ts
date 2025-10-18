@@ -7,8 +7,7 @@ export default defineEventHandler(async (event) => {
   const input = await readBody(event);
   const paidAt = new Date().toISOString();
   const paidValue = Number(removeMask(input.paidValue));
-  console.log(input.parcelId);
-  
+
   if (input.parcelId) {
     try {
       const parcel = await db
